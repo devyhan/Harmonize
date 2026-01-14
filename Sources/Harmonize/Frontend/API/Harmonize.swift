@@ -77,4 +77,72 @@ public struct Harmonize {
     public static func on(source: String) -> HarmonizeScope {
         PlainSourceScopeBuilder(source: source)
     }
+
+    // MARK: - Reporter API
+
+    /// Exports collected issues using the environment-specified reporter.
+    ///
+    /// Call this method after all tests have run to generate the report file.
+    /// Set `HARMONIZE_REPORTER` environment variable to enable (e.g., "codeclimate").
+    ///
+    /// ## Example Usage
+    /// ```swift
+    /// // In test teardown
+    /// override class func tearDown() {
+    ///     try? Harmonize.exportIssues()
+    ///     super.tearDown()
+    /// }
+    /// ```
+    ///
+    /// - Parameter outputPath: Optional custom output path for the report
+    /// - Returns: Path to the generated report file, or nil if reporting is disabled
+    @discardableResult
+    public static func exportIssues(to outputPath: String? = nil) throws -> URL? {
+        try IssueCollector.shared.export(to: outputPath)
+    }
+
+    /// Exports collected issues using a specific reporter.
+    ///
+    /// - Parameters:
+    ///   - reporter: Reporter identifier (e.g., "codeclimate")
+    ///   - outputPath: Optional custom output path for the report
+    /// - Returns: Path to the generated report file
+    @discardableResult
+    public static func exportIssues(using reporter: String, to outputPath: String? = nil) throws -> URL {
+        try IssueCollector.shared.export(using: reporter, to: outputPath)
+    }
+
+    /// Registers a custom reporter for use with Harmonize.
+    ///
+    /// ## Example
+    /// ```swift
+    /// // Register at test setup
+    /// Harmonize.registerReporter(MyCustomReporter())
+    /// ```
+    ///
+    /// - Parameter reporter: Reporter instance to register
+    public static func registerReporter<R: Reporter>(_ reporter: R) {
+        ReporterRegistry.shared.register(reporter)
+    }
+
+    /// Returns all collected issues.
+    ///
+    /// Useful for custom processing or debugging.
+    public static var collectedIssues: [ReportableIssue] {
+        IssueCollector.shared.collectedIssues
+    }
+
+    /// Clears all collected issues.
+    ///
+    /// Call this between test runs if needed.
+    public static func clearCollectedIssues() {
+        IssueCollector.shared.clear()
+    }
+
+    /// Sets the project root for relative path calculation in reports.
+    ///
+    /// - Parameter root: Project root directory URL
+    public static func setProjectRoot(_ root: URL) {
+        IssueCollector.shared.setProjectRoot(root)
+    }
 }

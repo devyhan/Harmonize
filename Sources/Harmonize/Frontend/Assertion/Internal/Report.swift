@@ -33,12 +33,15 @@ internal var isRunningSwiftTesting: Bool {
 }
 
 internal func reportIssues(_ issues: [CodeIssue]) {
+    // Collect issues for external reporters (CodeClimate, etc.)
+    IssueCollector.shared.collect(from: issues)
+
     func useXCT(issue: CodeIssue) {
         issue.filePath.relativePath.withStaticString {
             XCTFail(issue.message, file: $0, line: UInt(issue.line))
         }
     }
-    
+
     issues.forEach { issue in
         if isRunningSwiftTesting {
             #if canImport(Testing)
