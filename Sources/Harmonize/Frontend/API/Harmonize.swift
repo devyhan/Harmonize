@@ -145,4 +145,29 @@ public struct Harmonize {
     public static func setProjectRoot(_ root: URL) {
         IssueCollector.shared.setProjectRoot(root)
     }
+
+    /// Enables issue collection programmatically.
+    ///
+    /// Call this in test setup when environment variables are not available
+    /// (e.g., when running from Xcode).
+    ///
+    /// ## Example
+    /// ```swift
+    /// init() {
+    ///     Harmonize.enableReporting()
+    /// }
+    /// ```
+    public static func enableReporting() {
+        ReporterRegistry.shared.enableReporting()
+    }
+
+    /// Disables issue collection.
+    public static func disableReporting() {
+        ReporterRegistry.shared.disableReporting()
+    }
+
+    /// Returns whether issue collection is currently enabled.
+    public static var isReportingEnabled: Bool {
+        ReporterRegistry.shared.isReportingEnabled
+    }
 }

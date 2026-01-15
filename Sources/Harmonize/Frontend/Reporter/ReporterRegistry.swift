@@ -225,9 +225,9 @@ public final class ReporterRegistry: @unchecked Sendable {
 // MARK: - Convenience Extensions
 
 public extension ReporterRegistry {
-    /// Checks if reporting is enabled via environment variable.
+    /// Checks if reporting is enabled via environment variable or manual override.
     var isReportingEnabled: Bool {
-        environmentReporter() != nil
+        _reportingEnabled || environmentReporter() != nil
     }
 
     /// Default output filename based on environment reporter.
@@ -235,4 +235,19 @@ public extension ReporterRegistry {
         guard let reporter = environmentReporter() else { return nil }
         return "harmonize_\(type(of: reporter).identifier).\(type(of: reporter).fileExtension)"
     }
+
+    /// Programmatically enables issue collection.
+    /// Call this in test setup when environment variables are not available.
+    func enableReporting() {
+        _reportingEnabled = true
+    }
+
+    /// Disables issue collection.
+    func disableReporting() {
+        _reportingEnabled = false
+    }
 }
+
+// MARK: - Internal State
+
+private var _reportingEnabled = false
