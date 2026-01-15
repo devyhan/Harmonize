@@ -32,13 +32,25 @@ internal var isRunningSwiftTesting: Bool {
     #endif
 }
 
+// MARK: - XCTest Compatibility
+
+/// XCTFail wrapper for Xcode 26+ compatibility
+/// XCTest macros are not directly callable from Swift in newer Xcode versions
+internal func recordXCTestFailure(
+    _ message: String,
+    file: StaticString,
+    line: UInt
+) {
+    XCTAssertTrue(false, message, file: file, line: line)
+}
+
 internal func reportIssues(_ issues: [CodeIssue]) {
     // Collect issues for external reporters (CodeClimate, etc.)
     IssueCollector.shared.collect(from: issues)
 
     func useXCT(issue: CodeIssue) {
         issue.filePath.relativePath.withStaticString {
-            XCTFail(issue.message, file: $0, line: UInt(issue.line))
+            recordXCTestFailure(issue.message, file: $0, line: UInt(issue.line))
         }
     }
 
@@ -82,9 +94,9 @@ internal func reportInline(
             )
         )
         #else
-        XCTFail(message, file: file, line: line)
+        recordXCTestFailure(message, file: file, line: line)
         #endif
     } else {
-        XCTFail(message, file: file, line: line)
+        recordXCTestFailure(message, file: file, line: line)
     }
 }

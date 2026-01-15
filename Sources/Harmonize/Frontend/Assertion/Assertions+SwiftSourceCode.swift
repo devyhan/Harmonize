@@ -174,14 +174,14 @@ public extension Array where Element: SwiftSourceCode {
                     column: Int(column))
             )
             #else
-            XCTFail(
+            recordXCTestFailure(
                 message,
                 file: file,
                 line: line
             )
             #endif
         } else {
-            XCTFail(
+            recordXCTestFailure(
                 message,
                 file: file,
                 line: line
@@ -225,14 +225,14 @@ public extension Array where Element: SwiftSourceCode {
                     column: Int(column))
             )
             #else
-            XCTFail(
+            recordXCTestFailure(
                 message,
                 file: file,
                 line: line
             )
             #endif
         } else {
-            XCTFail(
+            recordXCTestFailure(
                 message,
                 file: file,
                 line: line
